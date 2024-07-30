@@ -48,21 +48,31 @@ def main():
         st.write(f"Fetching recommendations for {risk_tolerance} risk tolerance...")
         recommendations = recommend_stocks_to_buy(tickers, risk_tolerance)
 
-        st.write("### Recommended Stocks")
+        # Create table headers
+        cols = st.columns(6)
+        headers = ["Stock", "Composite Score", "Returns", "Risk", "Market Cap", ""]
+        for col, header in zip(cols, headers):
+            col.write(f"**{header}**")
+
+        # Create table rows with stock data and add to portfolio buttons
         for idx, row in recommendations.iterrows():
-            col1, col2 = st.columns([4, 1])
-            col1.write(
-                f"**{row['Ticker']}**: Composite Score: {row['Composite Score']:.2f}, Returns: {row['Returns']:.2f}%, Risk: {row['Risk']:.2f}%")
-            if col2.button("Add to Portfolio", key=f"add_{row['Ticker']}"):
+            cols = st.columns(6)
+            cols[0].write(f"**{row['Ticker']}**")
+            cols[1].write(f"{row['Composite Score']:.2f}")
+            cols[2].write(f"{row['Returns']:.2f}%")
+            cols[3].write(f"{row['Risk']:.2f}%")
+            cols[4].write(f"{row['Market Cap']:,}")
+            if cols[5].button("Add to Portfolio", key=f"add_{row['Ticker']}",
+                              help=f"Add {row['Ticker']} to your portfolio"):
                 if row['Ticker'] not in st.session_state['portfolio']:
                     st.session_state['portfolio'].append(row['Ticker'])
                     st.success(f"Added {row['Ticker']} to portfolio")
 
-    # Display the portfolio
+        # Display the portfolio
     st.write("### Your Portfolio")
     if st.session_state['portfolio']:
-        for ticker in st.session_state['portfolio']:
-            st.write(f"- {ticker}")
+        portfolio_df = pd.DataFrame(st.session_state['portfolio'], columns=['Ticker'])
+        st.write(portfolio_df)
     else:
         st.write("Your portfolio is empty.")
 

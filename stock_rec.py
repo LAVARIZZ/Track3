@@ -79,7 +79,7 @@ def recommend_stocks_to_buy(tickers, risk_tolerance):
     stock_data = fetch_stock_data(tickers)
     metrics_df = calculate_metrics(stock_data)
     ranked_stocks = score_and_rank_stocks(metrics_df, risk_tolerance)
-    return ranked_stocks.head(10)[['Ticker', 'Returns', 'Risk', 'Market Cap']]
+    return ranked_stocks.head(10)[['Ticker', 'Composite Score', 'Returns', 'Risk', 'Market Cap']]
 
 
 # Example usage
