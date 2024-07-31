@@ -7,19 +7,15 @@ from utils.chatbot.chat_history import ChatHistory
 from utils.chatbot.utils import Utilities
 
 
-from translate import Translator
-
-def translate_text(text, target_language):
-    translator = Translator(to_lang=target_language)
-    return translator.translate(text)
-
-
+from dotenv import load_dotenv
+load_dotenv()
 
 st.set_page_config(layout="wide", page_icon="💬", page_title="Finsmart | Chat-Bot 🤖")
 
 st.title("Finsmart | Chat-Bot 🤖")
 
 user_api_key = os.getenv("OPENAI_API_KEY")
+
 utils = Utilities()
 
    
