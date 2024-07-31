@@ -1,45 +1,93 @@
 import streamlit as st
+import requests
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
 
-# Example data
-stocks = [
-    {"name": "Apple Inc.", "recommended_investment": 10},
-    {"name": "Tesla Inc.", "recommended_investment": 15},
-    {"name": "Amazon.com Inc.", "recommended_investment": 12},
-]
+def fetch_historical_data(crypto_id, days=30):
+    url = f'https://api.coingecko.com/api/v3/coins/{crypto_id}/market_chart'
+    params = {
+        'vs_currency': 'usd',
+        'days': days
+    }
+    response = requests.get(url, params=params)
+    data = response.json()
+    prices = data.get('prices', [])
+    df = pd.DataFrame(prices, columns=['timestamp', 'price'])
+    df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+    df.set_index('timestamp', inplace=True)
+    return df
 
-def display_stocks(stocks):
-    st.title('Recommended Stocks for Investment')
+def fetch_market_data(crypto_ids):
+    url = 'https://api.coingecko.com/api/v3/coins/markets'
+    params = {
+        'vs_currency': 'usd',
+        'ids': ','.join(crypto_ids)
+    }
+    response = requests.get(url, params=params)
+    data = response.json()
+    return pd.DataFrame(data)
 
-    # Display the headers for the columns
-    st.write(
-        f"""
-        <div style="display: grid; grid-template-columns: 3fr 2fr 2fr; gap: 20px; font-weight: bold; margin-bottom: 20px; background-color: #f0f0f0; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-            <div style="font-size: 22px;">Stock Name</div>
-            <div style="font-size: 22px;">Number of Stocks You Invest</div>
-            <div style="font-size: 22px;">Number of Stocks Recommended</div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+st.title("Cryptocurrency Trends")
 
-    # Display the stock information in rows with input fields
-    for idx, stock in enumerate(stocks, start=1):
-        # Input field for number of stocks user is investing in
-        num_investing = st.number_input(f"Number of {stock['name']} stocks you are investing in", min_value=0, step=1, key=f"invest_{idx}")
+# Select cryptocurrency
+cryptos = ['bitcoin', 'ethereum', 'litecoin', 'ripple', 'cardano', 'polkadot']
+crypto = st.selectbox("Select Cryptocurrency", cryptos)
 
-        st.write(
-            f"""
-            <div style="display: grid; grid-template-columns: 3fr 2fr 2fr; gap: 20px; margin-bottom: 20px; padding: 15px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-                <div style="font-size: 18px; font-weight: bold;">{stock['name']}</div>
-                <div style="font-size: 18px; text-align: center;">{num_investing}</div>
-                <div style="font-size: 18px; text-align: center;">{stock['recommended_investment']}</div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+# Fetch historical data
+df = fetch_historical_data(crypto)
 
-def main():
-    display_stocks(stocks)
+# Plot price trends
+st.subheader(f'{crypto.capitalize()} Price Trends (Last 30 Days)')
+fig, ax = plt.subplots(figsize=(14, 6))
+ax.plot(df.index, df['price'], label=f'{crypto.capitalize()} Price')
+ax.set_xlabel('Date')
+ax.set_ylabel('Price (USD)')
+ax.set_title(f'{crypto.capitalize()} Price Trend Over Time')
+ax.legend()
+st.pyplot(fig)
 
-if __name__ == "__main__":
-    main()
+# Fetch market data
+market_df = fetch_market_data(cryptos)
+
+# Plot pie chart for market cap distribution with legend below
+st.subheader('Market Capitalization Distribution')
+fig, ax = plt.subplots(figsize=(10, 8))  # Adjust size if needed
+sizes = market_df['market_cap']
+labels = market_df['name']
+colors = plt.get_cmap('tab20').colors  # Use a colormap with distinct colors
+
+# Calculate percentage
+percentages = [f'{label}: {size / sum(sizes) * 100:.1f}%' for label, size in zip(labels, sizes)]
+
+# Plot pie chart
+wedges, texts, autotexts = ax.pie(sizes, labels=None, colors=colors, autopct='', startangle=140)
+ax.set_title('Market Cap Distribution of Cryptocurrencies')
+
+# Add legend below pie chart with percentages
+handles = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=color, markersize=10) for color in colors]
+legend_labels = [f'{label}: {percentage}' for label, percentage in zip(labels, percentages)]
+ax.legend(handles, legend_labels, title='Cryptocurrencies', loc='center left', bbox_to_anchor=(1, 0.5), fontsize=12)
+
+st.pyplot(fig)
+
+# Plot bar chart for price comparison
+st.subheader('Current Price Comparison')
+fig, ax = plt.subplots(figsize=(12, 8))
+sns.barplot(x='name', y='current_price', data=market_df, ax=ax)
+ax.set_xlabel('Cryptocurrency')
+ax.set_ylabel('Current Price (USD)')
+ax.set_title('Current Prices of Selected Cryptocurrencies')
+st.pyplot(fig)
+
+# Plot additional charts
+# Line chart for price trends over the last year
+st.subheader(f'{crypto.capitalize()} Price Trends (Last 365 Days)')
+df_year = fetch_historical_data(crypto, days=365)
+fig, ax = plt.subplots(figsize=(14, 6))
+ax.plot(df_year.index, df_year['price'], label=f'{crypto.capitalize()} Price')
+ax.set_xlabel('Date')
+ax.set_ylabel('Price (USD)')
+ax.set_title(f'{crypto.capitalize()} Price Trend Over the Last Year')
+ax.legend()
+st.pyplot(fig)
