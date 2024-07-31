@@ -9,12 +9,15 @@ from googletrans import Translator, LANGUAGES
 from langdetect import detect
 
 
+from dotenv import load_dotenv
+load_dotenv()
 
 st.set_page_config(layout="wide", page_icon="💬", page_title="Finsmart | Chat-Bot 🤖")
 
 st.title("Finsmart | Chat-Bot 🤖")
 
 user_api_key = os.getenv("OPENAI_API_KEY")
+
 utils = Utilities()
 
    

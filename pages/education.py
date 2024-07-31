@@ -1,15 +1,12 @@
 import streamlit as st
 
-
 # Title of the Financial Literacy Page
-st.title('Explore the education platform')
+st.title('Explore the Education Platform')
 
 # Section 1: Introduction to Financial Education
-
-# st.subheader('Why Financial Education?')
 st.subheader("""
    The education platform provides learning modules on portfolio construction and ETFs to help investors learn the basics and potentially make better investment decisions.
-    """)
+""")
 
 # Section 2: Display Videos with Titles
 with st.container():
@@ -53,8 +50,30 @@ with st.container():
     - [Investopedia](https://www.investopedia.com/)
     - [NerdWallet](https://www.nerdwallet.com/)
     - [The Balance](https://www.thebalance.com/)
-    - [Blackrock Acdemies](https://www.blackrock.com/americas-offshore/en/education)
+    - [Blackrock Academies](https://www.blackrock.com/americas-offshore/en/education)
     """)
+
+# FAQ Section with Expanders
+with st.container():
+    st.subheader('Frequently Asked Questions (FAQ)')
+
+    # FAQ 1
+    with st.expander("What is the Coffee Can Portfolio Strategy?"):
+        st.write("""
+        The Coffee Can Portfolio Strategy is an investment approach where you buy a set of high-quality stocks and then "forget" about them, allowing them to grow over a long period. The strategy is named after the idea of buying stocks and storing them in a coffee can, never to be touched again until you decide to sell. This approach minimizes the impact of market volatility and short-term trends, focusing instead on long-term growth.
+        """)
+
+    # FAQ 2
+    with st.expander("What is the Dollar-Cost Averaging Strategy?"):
+        st.write("""
+        Dollar-cost averaging (DCA) involves investing a fixed amount of money at regular intervals, regardless of the asset's price. This strategy reduces the impact of volatility by spreading out the investment over time. By purchasing more shares when prices are low and fewer shares when prices are high, DCA can lower the average cost per share and mitigate the risks of market timing.
+        """)
+
+    # FAQ 3
+    with st.expander("What is the Buy and Hold Strategy?"):
+        st.write("""
+        The Buy and Hold strategy involves purchasing stocks or other investments and holding them for an extended period, regardless of market fluctuations. The goal is to benefit from the long-term growth of the investment. This strategy requires patience and a belief in the underlying strength of the investments, as it avoids the costs and potential pitfalls associated with frequent trading.
+        """)
 
 # Footer
 st.write("© 2024 Financial Literacy Course. All rights reserved.")
