@@ -6,8 +6,10 @@ import sys
 from utils.chatbot.chat_history import ChatHistory
 from utils.chatbot.utils import Utilities
 
+
 from dotenv import load_dotenv
 load_dotenv()
+
 st.set_page_config(layout="wide", page_icon="💬", page_title="Finsmart | Chat-Bot 🤖")
 
 st.title("Finsmart | Chat-Bot 🤖")
