@@ -10,12 +10,29 @@ from pypfopt import risk_models, expected_returns
 import yfinance as yf
 from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
 from PIL import Image
+from utils.db_manager import DatabaseManager
+import streamlit as st
+import base64
+from io import BytesIO
+from PIL import Image
+import requests
+from utils.db_manager import DatabaseManager
+
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
 # Load ESG data
 esg_data = pd.read_csv("combined_esg.csv")
+db = DatabaseManager()
+
+def image_url_to_base64(image_url):
+    """Convert image URL to base64 string."""
+    response = requests.get(image_url)
+    image = Image.open(BytesIO(response.content))
+    buffered = BytesIO()
+    image.save(buffered, format=image.format)
+    return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
 # Portfolio Optimization Tool Header
 st.header("Smart Investment Navigator")
@@ -222,8 +239,24 @@ with st.container():
             image_response = requests.get(image_url)
             image = Image.open(BytesIO(image_response.content))
             st.image(image, caption="Generated Image", use_column_width=True)
+            st.session_state['image_url'] = image_url
+            st.session_state['image_generated'] = True
+
         else:
             st.error("Failed to generate image. Please check the API response.")
+
+    if 'image_generated' in st.session_state and st.session_state['image_generated']:
+        username = "Hansika Sachdeva"
+        caption = st.text_input("Caption", "Generated Image")
+        if st.button("Post to Database"):
+            img_base64 = image_url_to_base64(st.session_state['image_url'])
+            users = db.conn.execute("SELECT id, username FROM users").fetchall()
+            user_options = {username: user_id for user_id, username in users}
+            db.add_post(3, img_base64, caption)
+            st.success("Post added successfully!")
+            st.switch_page("/")
+
+            
 
     # Run the app
     if __name__ == "__main__":

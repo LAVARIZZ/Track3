@@ -108,7 +108,7 @@ def main():
         # Add a button to redirect to the portfolio page
     want_to_contribute = st.button("Optimise My Portfolio")
     if want_to_contribute:
-        switch_page("my_portfolios")
+        switch_page("InvestmentHelper")
 
 
 if __name__ == "__main__":
