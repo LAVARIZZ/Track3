@@ -1,0 +1,9 @@
+{
+    "users": [
+      {
+        "username": "user1",
+        "stocks": {"AAPL" : 3, "GOOGL": 2, "TSLA" : 4}
+      }
+    ]
+  }
+  

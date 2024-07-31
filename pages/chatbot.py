@@ -5,6 +5,8 @@ import re
 import sys
 from utils.chatbot.chat_history import ChatHistory
 from utils.chatbot.utils import Utilities
+from googletrans import Translator, LANGUAGES
+from langdetect import detect
 
 
 
@@ -19,7 +21,10 @@ utils = Utilities()
 
 uploaded_file = utils.handle_upload(["pdf", "txt", "csv"])
 
-
+def translate_text(text, target_lang='en'):
+    translator = Translator
+    translation = translator.translate(text, dest=target_lang)
+    return translation.text
 
 
 if uploaded_file:
@@ -41,6 +46,8 @@ if uploaded_file:
             with prompt_container:
                 # Display the prompt form
                 is_ready, user_input = utils.prompt_form()
+                original_language = detect(user_input)
+                user_input = translate_text(user_input, 'en')
 
                 # Initialize the chat history
                 history.initialize(uploaded_file)
@@ -66,6 +73,8 @@ if uploaded_file:
                     thoughts = captured_output.getvalue()
                     cleaned_thoughts = re.sub(r'\x1b\[[0-9;]*[a-zA-Z]', '', thoughts)
                     cleaned_thoughts = re.sub(r'\[1m>', '', cleaned_thoughts)
+                    cleaned_thoughts = translate_text(cleaned_thoughts, LANGUAGES[original_language])
+
 
                     # Display the agent's thoughts
                     with st.expander("Display the agent's thoughts"):
@@ -74,5 +83,3 @@ if uploaded_file:
             history.generate_messages(response_container)
     except Exception as e:
         st.error(f"Error: {str(e)}")
-
-
