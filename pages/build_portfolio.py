@@ -1,7 +1,9 @@
 import streamlit as st
 import pandas as pd
 from utils.stock_rec.stock_rec import StockRecommendation
-
+from streamlit_extras.switch_page_button import switch_page
+from dotenv import load_dotenv
+load_dotenv()
 # Function to get risk tolerance from slider value
 def get_risk_tolerance(value):
     if value < 33:
@@ -50,7 +52,7 @@ def main():
         st.session_state['recommendations'] = pd.DataFrame()
 
     # Get the number of recommendations to display from the user
-    top_n = st.number_input("Enter the number of recommendations to display", min_value=1, value=50, step=1)
+    top_n = st.number_input("Enter the number of recommendations to display", min_value=1, value=10, step=1)
     
     # Store the value in st.session_state
     st.session_state['top_n'] = top_n
@@ -95,6 +97,7 @@ def main():
             elif not value and ticker in st.session_state['portfolio']:
                 st.session_state['portfolio'].remove(ticker)
 
+    print(st.session_state['portfolio'])
     # Display the portfolio
     st.write("### Your Portfolio")
     if st.session_state['portfolio']:
@@ -102,6 +105,11 @@ def main():
         st.write(portfolio_df)
     else:
         st.write("Your portfolio is empty.")
+        # Add a button to redirect to the portfolio page
+    want_to_contribute = st.button("Optimise My Portfolio")
+    if want_to_contribute:
+        switch_page("my_portfolios")
+
 
 if __name__ == "__main__":
     main()
