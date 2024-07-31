@@ -7,6 +7,13 @@ from utils.chatbot.chat_history import ChatHistory
 from utils.chatbot.utils import Utilities
 
 
+from translate import Translator
+
+def translate_text(text, target_language):
+    translator = Translator(to_lang=target_language)
+    return translator.translate(text)
+
+
 
 st.set_page_config(layout="wide", page_icon="💬", page_title="Finsmart | Chat-Bot 🤖")
 
